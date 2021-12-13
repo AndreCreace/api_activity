@@ -23,7 +23,7 @@ Base.query = db_session.query_property()
 # Table People
 class Persons(Base):
 
-    # Here, we can ro chance the table´s name for the environment production
+    # Here, we can chance the table´s name for the environment production
     __tablename__ = "persons"
 
     # Attributes (Table´s fields)
@@ -57,6 +57,15 @@ class Activities(Base):
     person_id = Column(Integer, ForeignKey("persons.id")) # Foreign Key
     person = relationship("Persons")
 
+    # method to add a new person
+    def save(self):
+        db_session.add(self) # Let´s add the new activity
+        db_session.commit() # Let´s commit
+
+    # method to delete a person
+    def delete(self):
+        db_session.delete(self) # Let´s delete the activity
+        db_session.commit() # Let´s commit
 
 # Function to create our Data Base
 def init_db():
