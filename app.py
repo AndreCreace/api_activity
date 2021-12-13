@@ -5,13 +5,41 @@ from flask import Flask, request
 from flask_restful import Resource, Api
 
 # Let´s import our Models
-from models import Persons, Activities
+from models import Persons, Activities, Users
 
-# Let´s create our app
-app = Flask(__name__)
+# Let´s import flask-httpauth (HTTP basic authenticate for login/password)
+from flask_httpauth import HTTPBasicAuth
 
-# Let´s create api
-api = Api(app)
+# Configs
+app = Flask(__name__) # Let´s create our app
+api = Api(app) # Let´s create api
+auth = HTTPBasicAuth() # Let´s insert the Http authenticate
+
+# Let´s create a dictionary of users/password, to simulate the our  basic Http authenticate
+"""
+users = {
+    "andre":"123",
+    "gabi":"321"
+}
+
+# Let´s create a verification login/password method
+@auth.verify_password
+def verify_password(username, password):
+
+    # Let´s check if username AND password were informed
+    if not(username, password):
+        return False
+    return users.get(username) == password
+"""
+
+# Let´s create a verification login/password method
+@auth.verify_password
+def verify_password(username, password):
+    # Let´s check if username AND password were informed
+    if not(username, password):
+        return False
+    # Let´s search the user/password in users table. If the user not is found, return False
+    return Users.query.filter_by(username=username, password=password).first()
 
 # *******************************************************************************************
 # *********************************** Class Person ******************************************
@@ -19,6 +47,7 @@ api = Api(app)
 class Person(Resource):
 
     # ******************************** SMethod GET *********************************
+    @auth.login_required
     def get(self, name):
 
         # Let´s do a query on Persons Table using the name attribute. Let´s returning an object of type Persons
@@ -52,6 +81,7 @@ class Person(Resource):
         return response
 
     # ******************************** Method PUT *********************************
+    @auth.login_required
     def put(self, name):
 
         # Let´s do a query on persons table, to research any people by name.
@@ -101,6 +131,7 @@ class Person(Resource):
         return response
 
     # ******************************** Method DELETE *********************************
+    @auth.login_required
     def delete(self, name):
 
         # Local variables
@@ -147,6 +178,7 @@ class Person(Resource):
 class ListPeoples(Resource):
 
     # ******************************** Method GET *********************************
+    @auth.login_required
     def get(self):
 
         # Let´s do a query to return all registered people
@@ -159,6 +191,7 @@ class ListPeoples(Resource):
         return response
 
     # ******************************** Method POST *********************************
+    @auth.login_required
     def post(self):
 
         # Local variables
@@ -201,12 +234,14 @@ class ListPeoples(Resource):
 class ListActivity(Resource):
 
     # ******************************** Method GET (List all registered Activities) *********************************
+    @auth.login_required
     def get(self):
         activities = Activities.query.all()
         response = [{"id":activity.id, "description":activity.description, "person":activity.person.name} for activity in activities]
         return response
 
     # ******************************** Method POST (Create) *********************************
+    @auth.login_required
     def post(self):
 
         try:
@@ -256,6 +291,7 @@ class ListActivity(Resource):
 class Activity(Resource):
 
     # ******************************** Method GET *********************************
+    @auth.login_required
     def get(self, description):
         activity = Activities.query.filter_by(description=description).first()
         try:
@@ -281,6 +317,7 @@ class Activity(Resource):
         return response
 
     # ******************************** Method DELETE *********************************
+    @auth.login_required
     def delete(self, id):
         activity = Activities.query.filter_by(id=id).first()
         activity.delete()

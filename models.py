@@ -20,7 +20,8 @@ Base.query = db_session.query_property()
 
 ##### Let´s create our tables
 
-# Table People
+
+# ********************************** Table People ********************************
 class Persons(Base):
 
     # Here, we can chance the table´s name for the environment production
@@ -45,7 +46,7 @@ class Persons(Base):
     def __repr__(self):
         return "Person: {}".format(self.name)
 
-# Table Activities
+# *********************************** Table Activities **************************************
 class Activities(Base):
 
     # Here, we can ro chance the table´s name for the environment production
@@ -57,6 +58,10 @@ class Activities(Base):
     person_id = Column(Integer, ForeignKey("persons.id")) # Foreign Key
     person = relationship("Persons")
 
+    # Method to print (repr means representação in Portuguese)
+    def __repr__(self):
+        return "Activity: {}".format(self.description)
+
     # method to add a new person
     def save(self):
         db_session.add(self) # Let´s add the new activity
@@ -67,10 +72,35 @@ class Activities(Base):
         db_session.delete(self) # Let´s delete the activity
         db_session.commit() # Let´s commit
 
-# Function to create our Data Base
+# *********************************** Table Users **************************************
+class Users(Base):
+
+    # Here, we can ro chance the table´s name for the environment production
+    __tablename__ = "users"
+
+    # Attributes (Table´s fields)
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(20), index=True, unique=True) # The index is used in tunning queries, and the unique means unique indice
+    password = Column(String(50))
+
+    # Method to print (repr means representação in Portuguese)
+    def __repr__(self):
+        return "Username: {}".format(self.username)
+
+    # method to add a new person
+    def save(self):
+        db_session.add(self) # Let´s add the new activity
+        db_session.commit() # Let´s commit
+
+    # method to delete a person
+    def delete(self):
+        db_session.delete(self) # Let´s delete the activity
+        db_session.commit() # Let´s commit
+
+# ******************* Function to create our Data Base
 def init_db():
     Base.metadata.create_all(bind=engine)
 
-# Let´s check who´s calling the main
+# ******************** Let´s check who´s calling the main
 if __name__ == "__main__":
     init_db()

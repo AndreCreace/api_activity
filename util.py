@@ -1,5 +1,5 @@
 # Let´s import the dependencies
-from models import Persons
+from models import Persons, Users
 
 # Function to make a query and return a specific person
 def getPersonsAll():
@@ -51,6 +51,31 @@ def deletePerson():
     person = Persons.query.filter_by(name="Andre").first()  # Let´s make a query
     person.delete() # Let´s do the commit
 
+# ************************ USER ***************************
+def addUser():
+    user = Users(username="gabi", password="321")
+    user.save()
+
+def deleteUser():
+    user = Users.query.filter_by(username="andre").first()
+    user.delete()
+
+def getUserAll():
+
+    try:
+        user = Users.query.all()
+
+        # Let´s check if the pepople was located
+        if user:
+            print(user)
+
+        # The person was not locted
+        else:
+            print("User not located!")
+
+    except Exception as e:
+        print(str(e))
+
 # Let´s check who´s calling the main
 if __name__ == "__main__":
     #addPerson()
@@ -58,3 +83,5 @@ if __name__ == "__main__":
     #deletePerson()
     #getPersonsAll()
     #getPersonsByName()
+    addUser()
+    getUserAll()
